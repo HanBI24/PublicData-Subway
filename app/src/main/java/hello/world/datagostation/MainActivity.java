@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+//second
 public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private TextView textView;
