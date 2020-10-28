@@ -1,7 +1,7 @@
 # PublicData-Subway
 PublicData-Subway
 
-# Authourship  
+# Authorship  
 [**공공데이터포털**][datago]
 
 
