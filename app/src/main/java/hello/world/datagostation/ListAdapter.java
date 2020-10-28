@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public class ListAdapter extends BaseAdapter {
     public ArrayList<Station> list = new ArrayList<>();
+    // backup ArrayList
     private ArrayList<Station> arrayList = list;
 
     @Override
@@ -31,19 +32,19 @@ public class ListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
-        if(view == null){
+        if (view == null) {
             holder = new ViewHolder();
             view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_frame, viewGroup, false);
 
-            TextView stationLineText = (TextView)view.findViewById(R.id.station_line_text);
-            TextView stationNameText = (TextView)view.findViewById(R.id.station_name_text);
+            TextView stationLineText = (TextView) view.findViewById(R.id.station_line_text);
+            TextView stationNameText = (TextView) view.findViewById(R.id.station_name_text);
 
             holder.stationLine = stationLineText;
             holder.stationName = stationNameText;
 
             view.setTag(holder);
         } else {
-            holder = (ViewHolder)view.getTag();
+            holder = (ViewHolder) view.getTag();
         }
 
         Station station = arrayList.get(i);
@@ -53,7 +54,7 @@ public class ListAdapter extends BaseAdapter {
         return view;
     }
 
-    public void addItem(String stationLine, String stationName){
+    public void addItem(String stationLine, String stationName) {
         Station station = new Station();
 
         station.setStationLine(stationLine);
@@ -62,11 +63,11 @@ public class ListAdapter extends BaseAdapter {
         list.add(station);
     }
 
-    public void resetList(){
+    public void resetList() {
         arrayList.clear();
     }
 
-    static class ViewHolder{
+    static class ViewHolder {
         TextView stationLine, stationName;
     }
 }
