@@ -26,11 +26,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-//second
 public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private TextView textView;
-    private String stationCode;
     private XmlPullParser xpp;
     private ArrayList<String> stationNameArray;
     private ArrayList<String> stationLineArray;
@@ -46,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.et);
         textView = (TextView) findViewById(R.id.text);
-        listView = (ListView)findViewById(R.id.list_item);
+        listView = (ListView) findViewById(R.id.list_item);
         stationNameArray = new ArrayList<>();
         stationLineArray = new ArrayList<>();
         listAdapter = new ListAdapter();
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), position+"", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), stationNameArray.get(position), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -70,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                         getXmlDataStation();
-                        for(int i=0; i<stationNameArray.size(); i++){
+                        getXmlDataStation();
+                        for (int i = 0; i < stationNameArray.size(); i++) {
                             listAdapter.addItem(stationLineArray.get(i), stationNameArray.get(i));
                         }
                     } catch (UnsupportedEncodingException e) {
@@ -82,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
 //                            textView.setText(data);
 
-                            stationLineArray.clear();
-                            stationNameArray.clear();
                             listAdapter.notifyDataSetChanged();
 //                            listAdapter.resetList();
                         }
@@ -91,10 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
             resetListItem();
+            stationLineArray.clear();
+            stationNameArray.clear();
         }
     }
 
-    private void resetListItem(){
+    private void resetListItem() {
         listAdapter.resetList();
     }
 
@@ -151,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     case XmlPullParser.START_TAG:
                         tag = xpp.getName();
                         if (tag.equals("item")) ;
-                            else if (tag.equals("subwayRouteName")) {
+                        else if (tag.equals("subwayRouteName")) {
 //                            buffer.append("Station Line: ");
                             xpp.next();
                             stationLineArray.add(xpp.getText());
