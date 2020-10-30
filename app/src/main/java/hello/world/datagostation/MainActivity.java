@@ -3,6 +3,7 @@ package hello.world.datagostation;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getApplicationContext(), stationNameArray.get(position), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), AroundStation.class);
+                // 대박;; ArrayList 보내기
+//                intent.putStringArrayListExtra("station", stationNameArray);
+                intent.putExtra("station", stationNameArray.get(position));
+                startActivity(intent);
+
             }
         });
     }
@@ -137,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
                         } else if (tag.equals("subwayStationName")) {
                             xpp.next();
                             stationNameArray.add(xpp.getText());
-                            Log.d("1234", xpp.getText());
                         }
                         break;
 
