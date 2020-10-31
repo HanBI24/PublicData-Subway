@@ -1,6 +1,5 @@
 package hello.world.datagostation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +8,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListAdapter extends BaseAdapter {
-    public ArrayList<Station> list = new ArrayList<>();
+public class StationInfoListAdapter extends BaseAdapter {
+    public ArrayList<StationInfo> list = new ArrayList<>();
     // backup ArrayList
-    private ArrayList<Station> arrayList = list;
+    private ArrayList<StationInfo> arrayList = list;
 
     @Override
     public int getCount() {
@@ -47,7 +46,7 @@ public class ListAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        Station station = arrayList.get(i);
+        StationInfo station = arrayList.get(i);
         holder.stationLine.setText(station.getStationLine());
         holder.stationName.setText(String.valueOf(station.getStationName()));
 
@@ -55,7 +54,7 @@ public class ListAdapter extends BaseAdapter {
     }
 
     public void addItem(String stationLine, String stationName) {
-        Station station = new Station();
+        StationInfo station = new StationInfo();
 
         station.setStationLine(stationLine);
         station.setStationName(stationName);

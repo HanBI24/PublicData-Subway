@@ -6,13 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -21,18 +18,17 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private ArrayList<String> stationNameArray;
     private ArrayList<String> stationLineArray;
+    private ArrayList<String> stationID;
     XmlPullParser xpp;
-    ListAdapter listAdapter;
+    StationInfoListAdapter listAdapter;
     ListView listView;
     String tag;
     String key = "";
@@ -46,17 +42,21 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.list_item);
         stationNameArray = new ArrayList<>();
         stationLineArray = new ArrayList<>();
-        listAdapter = new ListAdapter();
+        stationID = new ArrayList<>();
+        listAdapter = new StationInfoListAdapter();
 
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), stationNameArray.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), stationID.get(position), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), AroundStation.class);
                 // 대박;; ArrayList 보내기
 //                intent.putStringArrayListExtra("station", stationNameArray);
-                intent.putExtra("station", stationNameArray.get(position));
+
+                /////// station id 보내야 함. 수정 //////
+                intent.putExtra("station_id", stationID.get(position));
+                intent.putExtra("key_value", key);
                 startActivity(intent);
 
             }
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             resetListItem();
             stationLineArray.clear();
             stationNameArray.clear();
+            stationID.clear();
         }
     }
 
@@ -144,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
                         } else if (tag.equals("subwayStationName")) {
                             xpp.next();
                             stationNameArray.add(xpp.getText());
+                        } else if(tag.equals("subwayStationId")){
+                            xpp.next();
+                            stationID.add(xpp.getText());
                         }
                         break;
 

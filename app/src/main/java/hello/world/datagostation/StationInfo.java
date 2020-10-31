@@ -1,6 +1,6 @@
 package hello.world.datagostation;
 
-public class Station {
+public class StationInfo {
     private String stationLine;
     private String stationName;
 
