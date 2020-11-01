@@ -74,6 +74,7 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
 //        googleMap.animateCamera(CameraUpdateFactory.zoomTo(14));
 
         // more info about GeoCoder...
+        // 데이터 전처리 시 공백 제거
         geocoder = new Geocoder(this);
         String str = buildingName;
         List<Address> addressList = null;
