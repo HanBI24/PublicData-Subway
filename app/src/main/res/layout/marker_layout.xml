@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/exit_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="출구"
+        android:textSize="28sp"
+        />
+
+    <TextView
+        android:id="@+id/buildings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="건물"
+        android:textSize="28sp"
+        />
+</LinearLayout>

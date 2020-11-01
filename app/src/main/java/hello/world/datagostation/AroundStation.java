@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
@@ -48,6 +50,15 @@ public class AroundStation extends Activity {
         listView = (ListView)findViewById(R.id.list_item);
         listAdapter = new StationAroundInfoListAdapter();
         listView.setAdapter(listAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), GoogleMapClass.class);
+                intent.putExtra("building_name", StationBuilding.get(position));
+                startActivity(intent);
+            }
+        });
 
         searchAround();
     }

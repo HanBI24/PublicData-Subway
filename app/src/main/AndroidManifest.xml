@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,7 +16,13 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".AroundStation"
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="" />
+        <activity android:name=".GoogleMapClass">
+        </activity>
+        <activity
+            android:name=".AroundStation"
             android:theme="@android:style/ThemeOverlay.Material.Dialog">
         </activity>
         <activity android:name=".MainActivity">
