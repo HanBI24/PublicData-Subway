@@ -29,6 +29,7 @@ public class AroundStation extends Activity {
     ListView listView;
     XmlPullParser xpp;
     String stationID;
+    String stationName;
     String key;
     String tag;
 
@@ -41,6 +42,7 @@ public class AroundStation extends Activity {
 
         Intent intent = getIntent();
         stationID = intent.getStringExtra("station_id");
+        stationName = intent.getStringExtra("station_name");
         key = intent.getStringExtra("key_value");
 
         StationBuilding = new ArrayList<>();
@@ -56,6 +58,8 @@ public class AroundStation extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), GoogleMapClass.class);
                 intent.putExtra("building_name", StationBuilding.get(position));
+                intent.putExtra("station_name", stationName);
+                Log.d("12345678", StationBuilding.get(position));
                 startActivity(intent);
             }
         });

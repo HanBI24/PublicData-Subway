@@ -9,6 +9,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,6 +28,8 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
     MarkerOptions markerOptions;
     Geocoder geocoder;
     String buildingName;
+    String stationName;
+    String []splitStr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
 
         Intent intent = getIntent();
         buildingName = intent.getStringExtra("building_name");
+        stationName = intent.getStringExtra("station_name");
 
         markerAroundInfo = new MarkerAroundInfo();
         markerAroundInfo.setBuilding_name("hello");
@@ -78,35 +82,36 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
         geocoder = new Geocoder(this);
         String str = buildingName;
         List<Address> addressList = null;
+        Log.d("buildnag_name", str);
         try{
             addressList = geocoder.getFromLocationName(str, 10);
-            Log.d("12345678", addressList.get(0).toString());
+//            Log.d("12345678", addressList.get(0).toString());
         }catch (IOException e){
             e.printStackTrace();
-        }catch(IndexOutOfBoundsException e){
-            String []temp = str.split(" ");
-            try {
-                addressList = geocoder.getFromLocationName(temp[0], 10);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
 
+        try {
+            assert addressList != null;
+            splitStr = addressList.get(0).toString().split(",");
+            Log.d("12345678", addressList.get(0).toString());
+            String address = splitStr[0].substring(splitStr[0].indexOf("\"") +1, splitStr[0].length() -2);
+            Log.d("12345678", address);
 
-        String []splitStr = addressList.get(0).toString().split(",");
-        Log.d("12345678", addressList.get(0).toString());
-        String address = splitStr[0].substring(splitStr[0].indexOf("\"") +1, splitStr[0].length() -2);
-        Log.d("12345678", address);
+            String latitude = splitStr[10].substring(splitStr[10].indexOf("=") +1);
+            String longitude = splitStr[12].substring(splitStr[12].indexOf("=") +1);
 
-        String latitude = splitStr[10].substring(splitStr[10].indexOf("=") +1);
-        String longitude = splitStr[12].substring(splitStr[12].indexOf("=") +1);
-
-        LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-        markerOptions = new MarkerOptions();
-        markerOptions.title(buildingName)
-                .snippet(address)
-                .position(point);
-        googleMap.addMarker(markerOptions);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+            LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+            markerOptions = new MarkerOptions();
+            markerOptions.title(buildingName)
+                    .snippet(address)
+                    .position(point);
+            googleMap.addMarker(markerOptions);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }catch (IndexOutOfBoundsException e){
+            Toast.makeText(getApplicationContext(), "준비 중...", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 }
