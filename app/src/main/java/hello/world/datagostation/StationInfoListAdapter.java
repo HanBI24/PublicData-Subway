@@ -48,7 +48,7 @@ public class StationInfoListAdapter extends BaseAdapter {
 
         StationInfo station = arrayList.get(i);
         holder.stationLine.setText(station.getStationLine());
-        holder.stationName.setText(String.valueOf(station.getStationName()));
+        holder.stationName.setText(String.valueOf(station.getStationName() +"역"));
 
         return view;
     }

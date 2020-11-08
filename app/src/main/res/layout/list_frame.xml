@@ -3,14 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20sp">
+    android:padding="20sp"
+    android:background="@drawable/layout_shape">
 
     <TextView
         android:id="@+id/station_line_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="line"
-        android:textSize="24sp"/>
+        android:textSize="12sp"
+        android:layout_marginBottom="3dp"/>
 
     <TextView
         android:id="@+id/station_name_text"
@@ -18,5 +20,7 @@
         android:layout_height="wrap_content"
         android:text="name"
         android:textSize="24sp"/>
+
+
 
 </LinearLayout>

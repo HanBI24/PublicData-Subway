@@ -4,13 +4,21 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gun0912.tedpermission.PermissionListener;
@@ -32,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> stationNameArray;
     private ArrayList<String> stationLineArray;
     private ArrayList<String> stationID;
+    LinearLayout searchLayout, mainLayout;
+    ImageView searchImage;
+    InputMethodManager imm;
     XmlPullParser xpp;
     StationInfoListAdapter listAdapter;
     ListView listView;
@@ -63,10 +74,37 @@ public class MainActivity extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.et);
         listView = (ListView) findViewById(R.id.list_item);
+        searchLayout = (LinearLayout)findViewById(R.id.search_layout);
+        mainLayout = (LinearLayout)findViewById(R.id.main_layout);
+        searchImage = (ImageView)findViewById(R.id.search);
+
+        imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         stationNameArray = new ArrayList<>();
         stationLineArray = new ArrayList<>();
         stationID = new ArrayList<>();
         listAdapter = new StationInfoListAdapter();
+
+        searchImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchLayout.setVisibility(View.GONE);
+                mainLayout.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.VISIBLE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
+        });
+
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                    searchStation();
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -87,41 +125,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void searchStation(View view) {
-        if (view.getId() == R.id.btn_station) {
-            // Android 4.0 이상부터 네트워크 처리는 반드시 Thread 사용.
-            // 작업 스레드: 네트워크
-            // UI 스레드: 그 외 나머지 (UI)
-            new Thread(new Runnable() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                @Override
-                public void run() {
-                    try {
-                        // parsing 시작
-                        getXmlDataStation();
-                        // getXmlDataStation()에서 리스트 크기만큼 반복해서 항목 추가
-                        for (int i = 0; i < stationNameArray.size(); i++) {
-                            listAdapter.addItem(stationLineArray.get(i), stationNameArray.get(i));
-                        }
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+    public void searchStation(){
+        new Thread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+                try {
+                    // parsing 시작
+                    getXmlDataStation();
+                    // getXmlDataStation()에서 리스트 크기만큼 반복해서 항목 추가
+                    for (int i = 0; i < stationNameArray.size(); i++) {
+                        listAdapter.addItem(stationLineArray.get(i), stationNameArray.get(i));
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 리스트 갱신
-                            listAdapter.notifyDataSetChanged();
-                        }
-                    });
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
-            }).start();
-            // 리스트 연속 출력 시 아래 문구를 사용해야 중복되지 않음
-            resetListItem();
-            stationLineArray.clear();
-            stationNameArray.clear();
-            stationID.clear();
-        }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 리스트 갱신
+                        listAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+        // 리스트 연속 출력 시 아래 문구를 사용해야 중복되지 않음
+        resetListItem();
+        stationLineArray.clear();
+        stationNameArray.clear();
+        stationID.clear();
     }
 
     // ListAdapter에 있는 data 삭제

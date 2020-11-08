@@ -8,35 +8,57 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/search_layout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:background="#63FFFFFF">
+
+        <ImageView
+            android:id="@+id/search"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_search_24"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="돋보기를 눌러\n역 또는 지역명을 검색하세요."
+            android:gravity="center"
+            android:textColor="#857B7B"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="10"
+        android:visibility="gone"
+        android:background="#63FFFFFF">
 
         <EditText
             android:id="@+id/et"
-            android:layout_width="250dp"
-            android:layout_height="match_parent"
-            android:hint="search station"/>
-
-        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:id="@+id/btn_station"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:onClick="searchStation"
-                android:text="search station"
-                android:textSize="12sp" />
-        </LinearLayout>
+            android:layout_height="match_parent"
+            android:hint=" 역 검색"
+            android:drawableLeft="@drawable/ic_baseline_search_24"
+            android:inputType="text"
+            android:layout_margin="10dp"
+            android:imeOptions="actionSearch">
+            <requestFocus/>
+        </EditText>
     </LinearLayout>
 
     <ListView
         android:id="@+id/list_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/list_frame" />
+        tools:listitem="@layout/list_frame"
+        android:visibility="gone"
+        android:background="#63FFFFFF"/>
 
 </LinearLayout>

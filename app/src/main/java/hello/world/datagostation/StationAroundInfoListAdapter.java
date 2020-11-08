@@ -47,8 +47,8 @@ public class StationAroundInfoListAdapter extends BaseAdapter {
         }
 
         StationAroundInfo stationAroundInfo = arrayList.get(i);
-        holder.stationBuilding.setText(stationAroundInfo.getBuildingName());
-        holder.stationExit.setText(String.valueOf(stationAroundInfo.getExitNo()));
+        holder.stationExit.setText(stationAroundInfo.getBuildingName());
+        holder.stationBuilding.setText(String.valueOf(stationAroundInfo.getExitNo() +"번 출구"));
 
         return view;
     }
