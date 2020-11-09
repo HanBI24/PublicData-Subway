@@ -28,7 +28,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="" />
 
-        <activity android:name=".GoogleMapClass">
+        <activity android:name=".GoogleMapClass"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
 
         <activity
