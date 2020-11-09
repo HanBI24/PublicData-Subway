@@ -33,6 +33,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'gun0912.ted:tedpermission:2.2.3'
+    compile 'com.taishi-y:flipprogressdialog:0.1.0'
 
 
 }

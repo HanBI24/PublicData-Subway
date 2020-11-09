@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.taishi.flipprogressdialog.FlipProgressDialog;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -74,11 +77,11 @@ public class MainActivity extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.et);
         listView = (ListView) findViewById(R.id.list_item);
-        searchLayout = (LinearLayout)findViewById(R.id.search_layout);
-        mainLayout = (LinearLayout)findViewById(R.id.main_layout);
-        searchImage = (ImageView)findViewById(R.id.search);
+        searchLayout = (LinearLayout) findViewById(R.id.search_layout);
+        mainLayout = (LinearLayout) findViewById(R.id.main_layout);
+        searchImage = (ImageView) findViewById(R.id.search);
 
-        imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         stationNameArray = new ArrayList<>();
         stationLineArray = new ArrayList<>();
         stationID = new ArrayList<>();
@@ -97,9 +100,10 @@ public class MainActivity extends AppCompatActivity {
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH){
-                    searchStation();
-                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+//                    searchStation();
+                    SearchStationTask task = new SearchStationTask();
+                    task.execute();
                     return true;
                 }
                 return false;
@@ -125,35 +129,66 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void searchStation(){
-        new Thread(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void run() {
-                try {
-                    // parsing 시작
-                    getXmlDataStation();
-                    // getXmlDataStation()에서 리스트 크기만큼 반복해서 항목 추가
-                    for (int i = 0; i < stationNameArray.size(); i++) {
-                        listAdapter.addItem(stationLineArray.get(i), stationNameArray.get(i));
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+    private class SearchStationTask extends AsyncTask<Void, Void, Void> {
+        private FlipProgressDialog fpd = new FlipProgressDialog();
+
+        @Override
+        protected void onPreExecute() {
+            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+            resetListItem();
+            stationLineArray.clear();
+            stationNameArray.clear();
+            stationID.clear();
+
+            List<Integer> imageList = new ArrayList<Integer>();
+            imageList.add(R.drawable.ic_baseline_subway_24);
+            fpd.setImageList(imageList);                              // *Set a imageList* [Have to. Transparent background png recommended]
+            fpd.setCanceledOnTouchOutside(true);                      // If true, the dialog will be dismissed when user touch outside of the dialog. If false, the dialog won't be dismissed.
+            fpd.setDimAmount(0.0f);                                   // Set a dim (How much dark outside of dialog)
+
+            // About dialog shape, color
+            fpd.setBackgroundColor(Color.parseColor("#FFFFFF"));      // Set a background color of dialog
+            fpd.setBackgroundAlpha(0.2f);                                        // Set a alpha color of dialog
+            fpd.setBorderStroke(0);                                              // Set a width of border stroke of dialog
+            fpd.setBorderColor(-1);                                              // Set a border stroke color of dialog
+            fpd.setCornerRadius(16);                                             // Set a corner radius
+
+            // About image
+            fpd.setImageSize(200);                                    // Set an image size
+            fpd.setImageMargin(10);                                   // Set a margin of image
+
+            // About rotation
+            fpd.setOrientation("rotationY");                          // Set a flipping rotation
+            fpd.setStartAngle(0.0f);                                  // Set an angle when flipping ratation start
+            fpd.setEndAngle(180.0f);                                  // Set an angle when flipping ratation end
+            fpd.setMinAlpha(0.0f);                                    // Set an alpha when flipping ratation start and end
+            fpd.setMaxAlpha(1.0f);                                    // Set an alpha while image is flipping
+
+
+            fpd.show(getFragmentManager(), "");
+            super.onPreExecute();
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                getXmlDataStation();
+                for (int i = 0; i < stationNameArray.size(); i++) {
+                    listAdapter.addItem(stationLineArray.get(i), stationNameArray.get(i));
                 }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 리스트 갱신
-                        listAdapter.notifyDataSetChanged();
-                    }
-                });
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
-        }).start();
-        // 리스트 연속 출력 시 아래 문구를 사용해야 중복되지 않음
-        resetListItem();
-        stationLineArray.clear();
-        stationNameArray.clear();
-        stationID.clear();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            listAdapter.notifyDataSetChanged();
+            fpd.dismiss();
+            super.onPostExecute(aVoid);
+        }
     }
 
     // ListAdapter에 있는 data 삭제
@@ -201,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if (tag.equals("subwayStationName")) {
                             xpp.next();
                             stationNameArray.add(xpp.getText());
-                        } else if(tag.equals("subwayStationId")){
+                        } else if (tag.equals("subwayStationId")) {
                             xpp.next();
                             stationID.add(xpp.getText());
                         }
