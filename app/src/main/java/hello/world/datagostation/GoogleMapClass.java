@@ -9,6 +9,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +31,7 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
     String buildingName;
     String stationName;
     String []splitStr;
+    TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,13 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
         markerAroundInfo = new MarkerAroundInfo();
         markerAroundInfo.setBuilding_name("hello");
         markerAroundInfo.setExit_no("world");
+
+        String text="";
+        tv = findViewById(R.id.tv);
+        for(int i=0; i<100; i++){
+            text += i +"\n";
+            tv.setText(text);
+        }
     }
 
     @Override
