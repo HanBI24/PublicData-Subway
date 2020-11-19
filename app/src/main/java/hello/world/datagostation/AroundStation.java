@@ -172,12 +172,13 @@ public class AroundStation extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void getXmlDataStation() throws UnsupportedEncodingException {
         String str = stationID;
+        String numRows = "100";
         Log.d("1234", str);
         // 한글은 인식을 못하기 때문에 UTF-8로 인코딩을 해줘야 함
         // Least Android API: KITKAT
 //        String location = URLEncoder.encode(str, java.nio.charset.StandardCharsets.UTF_8.toString());
         // 웹 사이트 uri 제작
-        String queryUrl = "http://openapi.tago.go.kr/openapi/service/SubwayInfoService/getSubwaySttnExitAcctoCfrFcltyList?serviceKey=" + key + "&subwayStationId=" + str;
+        String queryUrl = "http://openapi.tago.go.kr/openapi/service/SubwayInfoService/getSubwaySttnExitAcctoCfrFcltyList?serviceKey=" + key + "&subwayStationId=" + str + "&numOfRows=" + numRows;
 
         try {
             // 문자열인 url을 URL 객체로 생성
