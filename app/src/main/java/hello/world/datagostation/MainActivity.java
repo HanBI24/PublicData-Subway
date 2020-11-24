@@ -1,5 +1,7 @@
 package hello.world.datagostation;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,14 +10,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
+import android.net.Uri;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,6 +29,26 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.taishi.flipprogressdialog.FlipProgressDialog;
@@ -38,7 +64,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private EditText editText;
     private ArrayList<String> stationNameArray;
     private ArrayList<String> stationLineArray;
@@ -51,6 +77,15 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     String tag;
     String key = "";
+    FirebaseAnalytics mFirebaseAnalytics;
+    SignInButton Google_Login;
+    ImageView userImageView;
+    TextView userName, userEmail;
+    Button LogOutBtn;
+
+    private static final int RC_SIGN_IN = 1000;
+    private FirebaseAuth mAuth;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +110,27 @@ public class MainActivity extends AppCompatActivity {
                 .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
                 .check();
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
+                .build();
+
+        mAuth = FirebaseAuth.getInstance();
+
+        Google_Login = findViewById(R.id.google_sing_btn);
+        Google_Login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent,RC_SIGN_IN);
+            }
+        });
+
         editText = (EditText) findViewById(R.id.et);
         listView = (ListView) findViewById(R.id.list_item);
         searchLayout = (LinearLayout) findViewById(R.id.search_layout);
@@ -86,6 +142,28 @@ public class MainActivity extends AppCompatActivity {
         stationLineArray = new ArrayList<>();
         stationID = new ArrayList<>();
         listAdapter = new StationInfoListAdapter();
+
+        userImageView = (ImageView)findViewById(R.id.user_img);
+        userName = (TextView)findViewById(R.id.user_name);
+        userEmail = (TextView)findViewById(R.id.user_email);
+        LogOutBtn = (Button)findViewById(R.id.log_out_btn);
+
+        LogOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(getApplicationContext(), "log out", Toast.LENGTH_SHORT).show();
+
+                userImageView.setVisibility(View.GONE);
+                userEmail.setVisibility(View.GONE);
+                userName.setVisibility(View.GONE);
+
+                Google_Login.setVisibility(View.VISIBLE);
+                LogOutBtn.setVisibility(View.GONE);
+            }
+        });
+
+        Log.d("LifeCycle_Firebase", "onCreate");
 
         searchImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,6 +205,102 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                //구글 로그인 성공해서 파베에 인증
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+            }
+            else{
+                //구글 로그인 실패
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct){
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(),null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(!task.isSuccessful()){
+                            Toast.makeText(MainActivity.this, "인증 실패", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(MainActivity.this, "구글 로그인 인증 성공", Toast.LENGTH_SHORT).show();
+
+                            FirebaseUser currentUser = mAuth.getCurrentUser();
+
+                            if(currentUser!=null)
+                            {
+                                LoadUserInfo();
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LoadUserInfo();
+    }
+
+    // 파베 이미지 못 가져올때
+    // => 스레드 써서하면 되지 않을까 생각
+    public void LoadUserInfo(){
+
+        // 자동 로그인 시스템 전역 변수로 설정해서 처리
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser!=null)
+        {
+            String uName = null, uEmail = null;
+            Uri photoUrl = null;
+            String photoPath, newString;
+            // Variable holding the original String portion of the url that will be replaced
+            String originalPieceOfUrl = "s96-c/photo.jpg";
+
+            // Variable holding the new String portion of the url that does the replacing, to improve image quality
+            String newPieceOfUrlToAdd = "s400-c/photo.jpg";
+
+            for(UserInfo profile : currentUser.getProviderData()){
+                uName = profile.getDisplayName();
+                uEmail = profile.getEmail();
+                photoUrl = profile.getPhotoUrl();
+
+                if(photoUrl != null) {
+                    photoPath = photoUrl.toString();
+                    newString = photoPath.replace(originalPieceOfUrl, newPieceOfUrlToAdd);
+                    userImageView.setVisibility(View.VISIBLE);
+
+                    Glide.with(MainActivity.this)
+                            .load(newString)
+                            .into(userImageView);
+                }
+            }
+            userEmail.setVisibility(View.VISIBLE);
+            userName.setVisibility(View.VISIBLE);
+
+            Google_Login.setVisibility(View.GONE);
+            LogOutBtn.setVisibility(View.VISIBLE);
+
+            userName.setText(uName);
+            userEmail.setText(uEmail);
+            userImageView.setImageURI(photoUrl);
+
+            Toast.makeText(getApplicationContext(), "log in", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
     private class SearchStationTask extends AsyncTask<Void, Void, Void> {

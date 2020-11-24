@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "310755191722",
+    "firebase_url": "https://datagostation.firebaseio.com",
+    "project_id": "datagostation",
+    "storage_bucket": "datagostation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310755191722:android:4ab1a4aab10bfc4eb119d3",
+        "android_client_info": {
+          "package_name": "hello.world.datagostation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310755191722-uub280tiskf0fodtlmartc2h4172cqrj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hello.world.datagostation",
+            "certificate_hash": "a86b3f2ebc3df5dde3b64f12481e659e0471c1b4"
+          }
+        },
+        {
+          "client_id": "310755191722-c9nu9ftd6tj7jprskq9cnc05k0a234ne.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS8vY6ZLMVfijkkHKlyIE7UoLm8ThLLIA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310755191722-c9nu9ftd6tj7jprskq9cnc05k0a234ne.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

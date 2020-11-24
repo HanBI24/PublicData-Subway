@@ -51,7 +51,7 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
     String []splitStr;
     TextView tv;
     TextView setBuildingName;
-    TextView buildingLink;
+    TextView buildingLink, buildingAddress, buildingNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +89,9 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
 //        buildingLink.setText(link);
 
         buildingLink = (TextView)findViewById(R.id.link);
+        buildingAddress = (TextView)findViewById(R.id.building_address) ;
+        buildingNumber = (TextView)findViewById(R.id.tell_number);
+
         NaverSearchAsync async = new NaverSearchAsync(GoogleMapClass.this);
         async.execute();
     }
@@ -162,7 +165,7 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
     private static class NaverSearchAsync extends AsyncTask<Void, Void, Void>{
         public String clientId = ""; //애플리케이션 클라이언트 아이디값"
         public String clientSecret = ""; //애플리케이션 클라이언트 시크릿값"
-        public String title, address, link;
+        public String title, address, link, number;
         public String buildingText;
         private WeakReference<GoogleMapClass> activityWeakReference;
 
@@ -266,14 +269,15 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject item = jsonArray.getJSONObject(i);
                     title = item.getString("title");
-//                number = item.getString("number");
+//                    number = item.getString("number");
                     address = item.getString("address");
                     link = item.getString("link");
 
-                    System.out.println("TITLE : " + title);
-//                System.out.println("TITLE : " + number);
-                    System.out.println("TITLE : " + address);
-                    System.out.println("TITLE : " + link);
+                    // number: 왜인진 모르겠지만 정상작동안됨
+                    // 아마 null 이기 때문?
+//                    Log.d("building_info", number);
+                    Log.d("building_info", address);
+                    Log.d("building_info", link);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -286,6 +290,8 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
 
             GoogleMapClass activity = activityWeakReference.get();
             activity.buildingLink.setText(link);
+            activity.buildingAddress.setText(address);
+//            activity.buildingNumber.setText(number);
         }
     }
 
