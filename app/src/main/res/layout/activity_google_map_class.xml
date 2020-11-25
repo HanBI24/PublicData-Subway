@@ -16,7 +16,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -162,11 +162,11 @@
                         android:id="@+id/link"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:autoLink="web"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:text="정보 없음"
-                        android:textSize="16sp"
-                        android:autoLink="web"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -192,10 +192,30 @@
             <!--            android:id="@+id/comment_list"-->
             <!--            android:layout_width="match_parent"-->
             <!--            android:layout_height="match_parent" />-->
-            <TextView
-                android:id="@+id/tv"
+
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/input_opinion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"/>
+
+                <Button
+                    android:id="@+id/send_opinion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="send"/>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <ListView
+        android:id="@+id/opinion_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </LinearLayout>

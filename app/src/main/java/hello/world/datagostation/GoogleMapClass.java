@@ -1,5 +1,7 @@
 package hello.world.datagostation;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,6 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +28,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +50,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallback {
     MarkerAroundInfo markerAroundInfo;
@@ -49,9 +63,15 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
     String buildingName;
     String stationName;
     String []splitStr;
-    TextView tv;
-    TextView setBuildingName;
     TextView buildingLink, buildingAddress, buildingNumber;
+    ListView opinionList;
+    Button sendOpinion;
+    EditText inputOpinion;
+    TextView setBuildingName;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    String userName;
+    ArrayAdapter<String> arrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,23 +90,9 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
         markerAroundInfo.setBuilding_name("hello");
         markerAroundInfo.setExit_no("world");
 
-        String text="";
-        tv = findViewById(R.id.tv);
-        for(int i=0; i<100; i++){
-            text += i +"\n";
-            tv.setText(text);
-        }
 
         setBuildingName = (TextView)findViewById(R.id.building_name);
         setBuildingName.setText(buildingName);
-
-//        Thread thread = new NaverSearchAPI();
-//        thread.start();
-//
-//        NaverSearchSetData naverSearchSetData = new NaverSearchSetData();
-//        String link = naverSearchSetData.getLink();
-//        TextView buildingLink = (TextView)findViewById(R.id.link);
-//        buildingLink.setText(link);
 
         buildingLink = (TextView)findViewById(R.id.link);
         buildingAddress = (TextView)findViewById(R.id.building_address) ;
@@ -94,6 +100,79 @@ public class GoogleMapClass extends AppCompatActivity implements OnMapReadyCallb
 
         NaverSearchAsync async = new NaverSearchAsync(GoogleMapClass.this);
         async.execute();
+
+        inputOpinion = (EditText)findViewById(R.id.input_opinion);
+        sendOpinion = (Button)findViewById(R.id.send_opinion);
+        opinionList = (ListView)findViewById(R.id.opinion_list);
+
+        userName = "user" + new Random().nextInt(10000);
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        opinionList.setAdapter(arrayAdapter);
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
+
+        sendOpinion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OpinionData opinionData = new OpinionData(userName, inputOpinion.getText().toString());
+                databaseReference.child("opinion").child(buildingName).push().setValue(opinionData);
+                inputOpinion.setText("");
+            }
+        });
+
+        databaseReference.child("opinion").child(buildingName).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                OpinionData opinionData = snapshot.getValue(OpinionData.class);
+                arrayAdapter.add(opinionData.getUserName()+ ": " +opinionData.getOpinion());
+                arrayAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                OpinionData opinionData = snapshot.getValue(OpinionData.class);
+                arrayAdapter.remove(opinionData.getUserName()+ ": " +opinionData.getOpinion());
+                arrayAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+//        databaseReference.child("message").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                try {
+//                    String text = snapshot.getValue(String.class);
+//                    arrayAdapter.add(text);
+//                }catch (NullPointerException e){
+//                    Toast.makeText(getApplicationContext(), "NullPointerException", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
     @Override

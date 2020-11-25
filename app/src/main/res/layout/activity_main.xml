@@ -38,7 +38,8 @@
             android:id="@+id/user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:layout_marginTop="30dp"/>
 
         <TextView
             android:id="@+id/user_email"
@@ -60,6 +61,14 @@
             android:layout_height="wrap_content"
             android:text="Log Out"
             android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/remove_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove ID"
+            android:visibility="gone"
+            android:onClick="RemoveID"/>
 
     </LinearLayout>
 

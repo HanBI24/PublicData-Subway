@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     SignInButton Google_Login;
     ImageView userImageView;
     TextView userName, userEmail;
-    Button LogOutBtn;
+    Button LogOutBtn, RemoveIdBtn;
+    private FirebaseUser currentUser;
 
     private static final int RC_SIGN_IN = 1000;
     private FirebaseAuth mAuth;
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         userName = (TextView)findViewById(R.id.user_name);
         userEmail = (TextView)findViewById(R.id.user_email);
         LogOutBtn = (Button)findViewById(R.id.log_out_btn);
+        RemoveIdBtn = (Button)findViewById(R.id.remove_btn);
 
         LogOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         }else{
                             Toast.makeText(MainActivity.this, "구글 로그인 인증 성공", Toast.LENGTH_SHORT).show();
 
-                            FirebaseUser currentUser = mAuth.getCurrentUser();
+                            currentUser = mAuth.getCurrentUser();
 
                             if(currentUser!=null)
                             {
@@ -256,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void LoadUserInfo(){
 
         // 자동 로그인 시스템 전역 변수로 설정해서 처리
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
 
         if(currentUser!=null)
         {
@@ -289,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
             Google_Login.setVisibility(View.GONE);
             LogOutBtn.setVisibility(View.VISIBLE);
+            RemoveIdBtn.setVisibility(View.VISIBLE);
 
             userName.setText(uName);
             userEmail.setText(uEmail);
@@ -301,6 +304,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    public void RemoveID(View view) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(MainActivity.this, "remove ID", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private class SearchStationTask extends AsyncTask<Void, Void, Void> {
